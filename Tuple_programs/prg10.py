@@ -1,0 +1,6 @@
+tup = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+print("The tuple is:", tup)
+print("The first five elements of the tuple are:", tup[:5])
+print("The last five elements of the tuple are:", tup[5:11])
+print("middle five elements of the tuple are:", tup[2:7])
+print("Reverse:", tup[::-1])

@@ -1,0 +1,5 @@
+temp = (32,28,30,26,29,31,27,25)
+print("The temperature readings are:", temp)
+print("The maximum temperature is:", max(temp))
+print("The minimum temperature is:", min(temp))
+print("The average temperature is:", sum(temp)/len(temp))

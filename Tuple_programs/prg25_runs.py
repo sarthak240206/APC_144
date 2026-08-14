@@ -1,0 +1,6 @@
+runs = (45,30,100,51,68,10,90,75,80,60)
+print("The runs scored by the player in 10 matches are:", runs)
+print("The total runs scored by the player in 10 matches is:", sum(runs))
+print("highest runs scored by the player in a match is:", max(runs))
+print("lowest runs scored by the player in a match is:", min(runs))
+print("The average runs scored by the player in 10 matches is:", sum(runs)/len(runs))

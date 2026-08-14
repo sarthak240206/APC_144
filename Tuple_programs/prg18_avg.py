@@ -1,0 +1,5 @@
+tup = (34,54,67,89,12,300,42,1)
+print("The tuple is:", tup)
+total = sum(tup)
+average = total / len(tup)
+print("The average of the elements in the tuple is:", average)

@@ -1,0 +1,6 @@
+prices = (450,1000,340,756,34900,3778,2399300,98,10000,45)
+print("The prices of the products are:", prices)
+print("The total price of the products is:", sum(prices))
+print("The average price of the products is:", sum(prices)/len(prices))
+print("The maximum price of the products is:", max(prices))
+print("The minimum price of the products is:", min(prices))
