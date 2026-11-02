@@ -1,0 +1,39 @@
+<!--
+  base.html - shared layout for every page.
+  Updated navbar: Home | Search | Recommendations | Watch Later
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}MovieMate{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="{{ url_for('home') }}">MOVIEMATE</a>
+    <div class="nav-right">
+      <a href="{{ url_for('home') }}"          class="{{ 'nav-active' if request.endpoint == 'home' }}">Home</a>
+      <a href="{{ url_for('search_page') }}"   class="{{ 'nav-active' if request.endpoint == 'search_page' }}">Search</a>
+      <a href="{{ url_for('recommend') }}"     class="{{ 'nav-active' if request.endpoint in ('recommend','select') }}">Recommendations</a>
+      <a href="{{ url_for('watch_later') }}"   class="{{ 'nav-active' if request.endpoint == 'watch_later' }}">Watch Later</a>
+    </div>
+  </nav>
+
+  <!-- Flash messages (success / info / error) -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="{% block main_class %}container{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

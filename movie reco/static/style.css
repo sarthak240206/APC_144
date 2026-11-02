@@ -1,0 +1,177 @@
+/* style.css - Netflix-style dark theme for the whole website */
+:root {
+  --red: #e50914;       /* Netflix red */
+  --red-dark: #b20710;
+  --bg: #141414;        /* page background */
+  --panel: #181818;
+  --text: #ffffff;
+  --muted: #b3b3b3;
+  --green: #46d369;     /* "% Match" colour */
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+a { color: var(--text); }
+.muted { color: var(--muted); }
+
+/* ---------- Navbar ---------- */
+.navbar { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between;
+          align-items: center; padding: 16px 4%;
+          background: linear-gradient(180deg, rgba(0,0,0,.85), rgba(20,20,20,.6)); }
+.brand { color: var(--red); font-size: 1.9rem; font-weight: 900; letter-spacing: 2px; text-decoration: none; }
+.nav-right { display: flex; align-items: center; gap: 22px; }
+.nav-right a { text-decoration: none; font-size: .9rem; color: #e5e5e5; }
+.nav-right a:hover { color: var(--muted); }
+.avatar { width: 32px; height: 32px; border-radius: 4px; background: var(--red);
+          display: grid; place-items: center; font-weight: bold; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 24px 4% 60px; }
+.full { padding-bottom: 60px; }
+.alert { background: #e87c03; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px; }
+.page-title { font-size: 2.2rem; margin: 20px 0 6px; }
+
+/* ---------- Login / Register ---------- */
+.auth-page { background: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.85)),
+             radial-gradient(circle at 30% 20%, #3a0a0d 0%, #141414 70%); min-height: 100vh; }
+.auth-page .navbar { background: none; position: static; }
+.auth-wrap { display: flex; justify-content: center; padding: 20px; }
+.auth-card { background: rgba(0,0,0,.75); width: 100%; max-width: 420px; padding: 56px 60px 48px;
+             border-radius: 6px; }
+.auth-card h1 { margin: 0 0 24px; font-size: 2rem; }
+.auth-card input { width: 100%; padding: 16px; margin-bottom: 16px; border: 0; border-radius: 4px;
+                   background: #333; color: #fff; font-size: 1rem; }
+.auth-card input:focus { outline: 2px solid #fff3; }
+.auth-card .btn { width: 100%; margin-top: 12px; }
+.auth-card a { color: #fff; }
+
+/* ---------- Buttons ---------- */
+.btn { display: inline-block; padding: 12px 24px; border: 0; border-radius: 4px; font-size: 1rem;
+       font-weight: 700; cursor: pointer; text-decoration: none; color: #fff; }
+.btn-red { background: var(--red); }
+.btn-red:hover { background: var(--red-dark); }
+.btn-red:disabled { background: #4a4a4a; color: #999; cursor: not-allowed; }
+.btn-grey { background: rgba(109,109,110,.7); }
+.btn-grey:hover { background: rgba(109,109,110,.4); }
+
+/* ---------- Select page ---------- */
+.search { width: 100%; margin: 18px 0; padding: 16px 20px; font-size: 1.1rem; color: #fff;
+          background: #2b2b2b; border: 1px solid #555; border-radius: 4px; }
+.search:focus { outline: 2px solid #fff; }
+.tray { position: sticky; top: 64px; z-index: 10; display: flex; align-items: center; gap: 16px;
+        padding: 12px 0; background: var(--bg); border-bottom: 1px solid #333; }
+.chips { flex: 1; display: flex; gap: 8px; overflow-x: auto; }
+.chip { white-space: nowrap; background: #333; padding: 6px 12px; border-radius: 20px;
+        font-size: .85rem; cursor: pointer; }
+.chip:hover { background: var(--red); }
+.row-title { font-size: 1.4rem; margin: 28px 0 12px; }
+
+/* ---------- Poster grid ---------- */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+.poster { position: relative; border-radius: 4px; overflow: hidden; cursor: pointer;
+          aspect-ratio: 2 / 3; background: #222; transition: transform .25s; }
+.poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.poster:hover { transform: scale(1.06); z-index: 3; box-shadow: 0 8px 24px rgba(0,0,0,.7); }
+.poster-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 8px 8px;
+               font-size: .8rem; background: linear-gradient(transparent, rgba(0,0,0,.95)); }
+.tick { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%;
+        background: var(--red); display: none; place-items: center; font-weight: bold; }
+.poster.chosen { outline: 3px solid var(--red); }
+.poster.chosen .tick { display: grid; }
+
+/* ---------- Recommendations page ---------- */
+.hero { min-height: 70vh; display: flex; align-items: center; padding: 0 4%;
+        background-size: cover; background-position: center top; }
+.hero-text { max-width: 560px; }
+.top-pill { color: var(--red); font-weight: 800; letter-spacing: 3px; font-size: .8rem; }
+.hero h1 { font-size: 3.4rem; margin: 10px 0; line-height: 1.05; }
+.meta { color: #d2d2d2; }
+.match { color: var(--green); font-weight: 700; }
+.overview { font-size: 1.15rem; line-height: 1.45; text-shadow: 0 2px 6px #000; }
+.why { color: var(--muted); font-style: italic; }
+
+.row { display: flex; gap: 12px; align-items: center; overflow-x: auto; padding-bottom: 8px; }
+.poster.small { flex: 0 0 130px; cursor: default; }
+.edit-btn { flex: 0 0 auto; margin-left: 12px; }
+
+/* Details panel that slides up over a recommended poster on hover */
+.poster-details { position: absolute; inset: auto 0 0 0; padding: 14px 10px; display: flex;
+                  flex-direction: column; gap: 3px; background: rgba(10,10,10,.93);
+                  transform: translateY(100%); transition: transform .25s; font-size: .85rem; }
+.poster.hoverable:hover .poster-details { transform: translateY(0); }
+.poster-details small { color: var(--muted); }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 2.2rem; }
+  .auth-card { padding: 32px 24px; }
+  .nav-right a { display: none; }
+  .tray { flex-wrap: wrap; top: 60px; }
+}
+
+/* ---------- Active nav link ---------- */
+.nav-right a.nav-active { color: var(--text); font-weight: 700; border-bottom: 2px solid var(--red); padding-bottom: 2px; }
+
+/* ---------- Flash messages ---------- */
+.flash-wrap { position: fixed; top: 72px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+.flash { padding: 12px 20px; border-radius: 4px; font-size: .9rem; font-weight: 600;
+         box-shadow: 0 4px 16px rgba(0,0,0,.5); animation: slideIn .3s ease; }
+.flash-success { background: var(--green); color: #000; }
+.flash-info    { background: #2b6cb0; color: #fff; }
+.flash-error   { background: var(--red); color: #fff; }
+@keyframes slideIn { from { opacity:0; transform: translateX(40px); } to { opacity:1; transform: translateX(0); } }
+
+/* ---------- Home page ---------- */
+.home-hero { padding: 32px 0 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.home-hero .page-title { margin: 0; }
+.load-more-wrap { text-align: center; padding: 40px 0 20px; }
+
+/* ---------- Empty state ---------- */
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state p { font-size: 1.15rem; margin-bottom: 8px; }
+
+/* ---------- Search page ---------- */
+/* (reuses .search, .grid, .poster, .poster-details from existing CSS) */
+
+/* ---------- Movie detail page ---------- */
+.detail-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; margin-top: 32px; align-items: start; }
+.detail-poster img { width: 100%; border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,.7); }
+.detail-info h2 { font-size: 2rem; margin: 0 0 16px; }
+.detail-table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
+.detail-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 6px 16px 6px 0; white-space: nowrap; width: 110px; }
+.detail-table td { padding: 6px 0; }
+.detail-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+/* ---------- Filter panel (recommend form) ---------- */
+.filter-panel { background: var(--panel); border-radius: 6px; padding: 24px 28px; margin: 20px 0; border: 1px solid #2a2a2a; }
+.filter-label  { display: block; font-size: .8rem; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.filter-group  { margin-bottom: 20px; }
+.filter-row    { display: flex; gap: 16px; flex-wrap: wrap; }
+.filter-col    { flex: 1; min-width: 140px; }
+.filter-input  { width: 100%; padding: 10px 14px; background: #2b2b2b; border: 1px solid #555;
+                 border-radius: 4px; color: #fff; font-size: .95rem; }
+.filter-input:focus { outline: 2px solid var(--red); }
+
+/* "or" divider between filter panel and movie picker */
+.filter-section-divider { display: flex; align-items: center; gap: 16px; margin: 28px 0 4px; color: var(--muted); font-size: .9rem; }
+.filter-section-divider::before,
+.filter-section-divider::after { content: ''; flex: 1; height: 1px; background: #333; }
+
+/* Genre checkbox chips */
+.genre-chips-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.genre-chip { display: inline-flex; align-items: center; gap: 6px; background: #2b2b2b;
+              border: 1px solid #444; border-radius: 20px; padding: 6px 14px;
+              font-size: .85rem; cursor: pointer; transition: background .15s, border-color .15s; }
+.genre-chip:hover { background: #3a3a3a; border-color: #777; }
+.genre-chip input { accent-color: var(--red); cursor: pointer; }
+.genre-chip:has(input:checked) { background: rgba(229,9,20,.2); border-color: var(--red); }
+
+/* ---------- Filter summary on results page ---------- */
+.filter-summary { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+                  background: var(--panel); border-radius: 4px; padding: 12px 16px;
+                  margin-bottom: 20px; font-size: .88rem; }
+
+/* ---------- Responsive fixes ---------- */
+@media (max-width: 700px) {
+  .detail-grid  { grid-template-columns: 1fr; }
+  .filter-row   { flex-direction: column; }
+  .home-hero    { flex-direction: column; align-items: flex-start; }
+}

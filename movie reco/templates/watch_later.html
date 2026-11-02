@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Watch Later – MovieMate{% endblock %}
+{% block content %}
+
+<h1 class="page-title">🕐 Watch Later</h1>
+<p class="muted">Your personal saved movies list. Only you can see this.</p>
+
+{% if movies %}
+  <p class="muted" style="margin-bottom:24px;">{{ movies|length }} movie{{ 's' if movies|length != 1 }} saved.</p>
+  <div class="grid">
+    {% for m in movies %}
+    <div class="poster hoverable" style="cursor:default;">
+      <a href="{{ url_for('movie_detail', movie_id=m.id) }}" style="display:contents; text-decoration:none;">
+        <img src="{{ m.poster }}" alt="{{ m.title }}" loading="lazy">
+      </a>
+      <div class="poster-details">
+        <strong>{{ m.title }}</strong>
+        <small>{{ m.year }} · ★ {{ m.rating }}</small>
+        <small>{{ m.genres }}</small>
+        <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+          <a href="{{ url_for('movie_detail', movie_id=m.id) }}"
+             class="btn btn-red" style="padding:6px 12px;font-size:.78rem;">Details</a>
+          <form method="post" action="{{ url_for('watch_later_remove', movie_id=m.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-grey"
+                    style="padding:6px 12px;font-size:.78rem;background:#6b1111;"
+                    onclick="return confirm('Remove {{ m.title }}?')">✕ Remove</button>
+          </form>
+        </div>
+      </div>
+      <div class="poster-info">{{ m.title }}{% if m.year %} ({{ m.year }}){% endif %}</div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>📭 Your Watch Later list is empty.</p>
+    <p class="muted">Browse movies or check out recommendations and click <strong>+ Watch Later</strong> to save them here.</p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+      <a href="{{ url_for('home') }}"    class="btn btn-red">Browse Movies</a>
+      <a href="{{ url_for('recommend') }}" class="btn btn-grey">Get Recommendations</a>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}
+

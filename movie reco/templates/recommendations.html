@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Recommended for you – MovieMate{% endblock %}
+{% block main_class %}full{% endblock %}
+{% block content %}
+
+<!-- Hero banner: top recommended movie -->
+{% if recs %}
+{% set top = recs[0] %}
+<section class="hero" style="background-image: linear-gradient(90deg,#141414 25%,rgba(20,20,20,.1) 100%), url('{{ top.backdrop or top.poster }}')">
+  <div class="hero-text">
+    <span class="top-pill">TOP PICK FOR YOU</span>
+    <h1>{{ top.title }}</h1>
+    <p class="meta">
+      <span class="match">{{ top.score }}% Match</span>
+      {{ top.year }} · ★ {{ top.rating }} · {{ top.genres }}
+    </p>
+    <p class="overview">{{ top.overview[:260] }}{% if top.overview|length > 260 %}…{% endif %}</p>
+    <p class="why">{{ top.reason }}</p>
+    <div style="margin-top:20px; display:flex; gap:12px; flex-wrap:wrap;">
+      <a href="{{ url_for('movie_detail', movie_id=top.id) }}" class="btn btn-red">More Info</a>
+      <form method="post" action="{{ url_for('watch_later_add', movie_id=top.id) }}" style="display:inline;">
+        <button type="submit" class="btn btn-grey">+ Watch Later</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<div class="container">
+
+  <!-- Active filters summary (if any) -->
+  {% if genres_sel or year_from or year_to or min_rating or keyword %}
+  <div class="filter-summary">
+    <span class="muted">Filters applied:</span>
+    {% if genres_sel %}<span class="chip">{{ genres_sel|join(', ') }}</span>{% endif %}
+    {% if year_from or year_to %}<span class="chip">{{ year_from or '?' }} – {{ year_to or '?' }}</span>{% endif %}
+    {% if min_rating %}<span class="chip">★ ≥ {{ min_rating }}</span>{% endif %}
+    {% if keyword %}<span class="chip">keyword: {{ keyword }}</span>{% endif %}
+    <a href="{{ url_for('recommend') }}" class="btn btn-grey" style="padding:6px 14px;font-size:.85rem;">Change Filters</a>
+  </div>
+  {% endif %}
+
+  <!-- Because you picked row -->
+  {% if picked %}
+  <h2 class="row-title">Because you picked</h2>
+  <div class="row">
+    {% for m in picked %}
+    <a class="poster small" href="{{ url_for('movie_detail', movie_id=m.id) }}" style="text-decoration:none;">
+      <img src="{{ m.poster }}" alt="{{ m.title }}" loading="lazy">
+      <div class="poster-info">{{ m.title }}</div>
+    </a>
+    {% endfor %}
+    <a class="btn btn-grey edit-btn" href="{{ url_for('recommend') }}">Edit preferences</a>
+  </div>
+  {% else %}
+  <div style="margin:24px 0 8px; display:flex; align-items:center; gap:16px;">
+    <h2 class="row-title" style="margin:0;">Recommended for you</h2>
+    <a href="{{ url_for('recommend') }}" class="btn btn-grey" style="padding:8px 16px;font-size:.85rem;">Change Preferences</a>
+  </div>
+  {% endif %}
+
+  <!-- Recommendations grid -->
+  <h2 class="row-title">Recommended for you</h2>
+  <div class="grid">
+    {% for m in recs[1:] %}
+    <div class="poster hoverable" style="cursor:default;">
+      <a href="{{ url_for('movie_detail', movie_id=m.id) }}" style="display:contents; text-decoration:none;">
+        <img src="{{ m.poster }}" alt="{{ m.title }}" loading="lazy">
+      </a>
+      <div class="poster-details">
+        <strong>{{ m.title }}</strong>
+        <span class="match">{{ m.score }}% Match</span>
+        <small>{{ m.year }} · ★ {{ m.rating }}</small>
+        <small>{{ m.genres }}</small>
+        <small class="why">{{ m.reason }}</small>
+        <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+          <a href="{{ url_for('movie_detail', movie_id=m.id) }}" class="btn btn-red" style="padding:6px 12px;font-size:.78rem;">Details</a>
+          <form method="post" action="{{ url_for('watch_later_add', movie_id=m.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-grey" style="padding:6px 12px;font-size:.78rem;">+ Watch Later</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if not recs %}
+  <div class="empty-state">
+    <p>😕 No recommendations match your filters.</p>
+    <p class="muted">Try relaxing the filters — wider genre, broader year range, or lower minimum rating.</p>
+    <a href="{{ url_for('recommend') }}" class="btn btn-red">Try Different Preferences</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Pick your movies – MovieMate{% endblock %}
+{% block content %}
+<h1 class="page-title">What have you watched and loved?</h1>
+<p class="muted">Search any movie and click it to select. Pick as many as you like (at least 1).</p>
+
+<form method="post" id="pick-form">
+  <!-- Search box (calls /api/search while typing) -->
+  <input type="text" id="search" class="search"
+         placeholder="Search movies, e.g. Avengers, Inception…" autocomplete="off">
+
+  <!-- Selected movies shown as chips -->
+  <div class="tray">
+    <span id="count-label">Selected: <b id="count">0</b></span>
+    <div id="chips" class="chips"></div>
+    <button class="btn btn-red" id="submit-btn" type="submit" disabled>Get Recommendations</button>
+  </div>
+
+  <!-- Hidden inputs holding the chosen ids — populated by JavaScript -->
+  <div id="hidden-ids"></div>
+
+  <h2 class="row-title" id="grid-title">Popular movies</h2>
+  <div class="grid" id="grid"></div>
+</form>
+
+<script>
+  const selected = new Map();
+  {{ saved|tojson }}.forEach(m => selected.set(m.id, m));
+
+  const grid  = document.getElementById('grid');
+  const chips = document.getElementById('chips');
+
+  function makeCard(m) {
+    const card = document.createElement('div');
+    card.className = 'poster' + (selected.has(m.id) ? ' chosen' : '');
+    card.dataset.id = m.id;
+
+    const img = document.createElement('img');
+    img.src = m.poster; img.alt = m.title; img.loading = 'lazy';
+
+    const tick = document.createElement('span');
+    tick.className = 'tick'; tick.textContent = '✓';
+
+    const info = document.createElement('div');
+    info.className = 'poster-info';
+    info.textContent = m.title + (m.year ? ' (' + m.year + ')' : '');
+
+    card.append(img, tick, info);
+    card.addEventListener('click', () => toggle(m, card));
+    return card;
+  }
+
+  function toggle(m, card) {
+    if (selected.has(m.id)) selected.delete(m.id); else selected.set(m.id, m);
+    if (card) card.classList.toggle('chosen', selected.has(m.id));
+    refreshTray();
+  }
+
+  function refreshTray() {
+    document.getElementById('count').textContent = selected.size;
+    document.getElementById('submit-btn').disabled = selected.size === 0;
+    chips.replaceChildren();
+    selected.forEach(m => {
+      const c = document.createElement('span');
+      c.className = 'chip'; c.textContent = m.title + '  ✕';
+      c.addEventListener('click', () => {
+        selected.delete(m.id);
+        const card = grid.querySelector('[data-id="' + m.id + '"]');
+        if (card) card.classList.remove('chosen');
+        refreshTray();
+      });
+      chips.append(c);
+    });
+    const box = document.getElementById('hidden-ids');
+    box.replaceChildren();
+    selected.forEach(m => {
+      const i = document.createElement('input');
+      i.type = 'hidden'; i.name = 'movie_ids'; i.value = m.id;
+      box.append(i);
+    });
+  }
+
+  async function load(q) {
+    const res    = await fetch('/api/search?q=' + encodeURIComponent(q));
+    const movies = await res.json();
+    document.getElementById('grid-title').textContent =
+      q ? 'Results for "' + q + '"' : 'Popular movies';
+    grid.replaceChildren(...movies.map(makeCard));
+    if (!movies.length) grid.textContent = 'No movies found.';
+  }
+
+  let timer;
+  document.getElementById('search').addEventListener('input', e => {
+    clearTimeout(timer);
+    timer = setTimeout(() => load(e.target.value), 300);
+  });
+
+  refreshTray();
+  load('');
+</script>
+{% endblock %}

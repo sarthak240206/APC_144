@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ movie.title }} – MovieMate{% endblock %}
+{% block main_class %}full{% endblock %}
+{% block content %}
+
+<!-- Hero backdrop -->
+<section class="hero" style="background-image: linear-gradient(90deg,#141414 35%,rgba(20,20,20,.15) 100%), url('{{ movie.backdrop or movie.poster }}')">
+  <div class="hero-text">
+    <h1>{{ movie.title }}</h1>
+    <p class="meta">
+      {% if movie.year %}<span>{{ movie.year }}</span> · {% endif %}
+      <span class="match">★ {{ movie.rating }}</span> ·
+      {{ movie.genres }}
+    </p>
+    <p class="overview">{{ movie.overview[:300] }}{% if movie.overview|length > 300 %}…{% endif %}</p>
+
+    <div class="detail-actions">
+      <!-- Watch Later toggle -->
+      {% if saved %}
+        <form method="post" action="{{ url_for('watch_later_remove', movie_id=movie.id) }}" style="display:inline;">
+          <button type="submit" class="btn btn-grey">✓ In Watch Later</button>
+        </form>
+      {% else %}
+        <form method="post" action="{{ url_for('watch_later_add', movie_id=movie.id) }}" style="display:inline;">
+          <button type="submit" class="btn btn-red">+ Watch Later</button>
+        </form>
+      {% endif %}
+
+      <a href="{{ url_for('home') }}" class="btn btn-grey">← Browse</a>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="detail-grid">
+    <!-- Poster column -->
+    <div class="detail-poster">
+      <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+    </div>
+
+    <!-- Info column -->
+    <div class="detail-info">
+      <h2>{{ movie.title }} {% if movie.year %}<span class="muted" style="font-weight:400;font-size:1.4rem;">({{ movie.year }})</span>{% endif %}</h2>
+
+      <table class="detail-table">
+        {% if movie.genres %}
+        <tr><th>Genres</th><td>{{ movie.genres }}</td></tr>
+        {% endif %}
+        {% if movie.rating %}
+        <tr><th>Rating</th><td><span class="match">★ {{ movie.rating }}</span></td></tr>
+        {% endif %}
+        {% if movie.year %}
+        <tr><th>Year</th><td>{{ movie.year }}</td></tr>
+        {% endif %}
+      </table>
+
+      {% if movie.overview %}
+      <h3 style="margin-top:24px;">Overview</h3>
+      <p style="line-height:1.6; color:#d2d2d2;">{{ movie.overview }}</p>
+      {% endif %}
+
+      <div class="detail-actions" style="margin-top:28px;">
+        {% if saved %}
+          <form method="post" action="{{ url_for('watch_later_remove', movie_id=movie.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-grey">✓ Remove from Watch Later</button>
+          </form>
+        {% else %}
+          <form method="post" action="{{ url_for('watch_later_add', movie_id=movie.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-red">+ Add to Watch Later</button>
+          </form>
+        {% endif %}
+        <a href="{{ url_for('recommend') }}" class="btn btn-grey">Get Recommendations</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+

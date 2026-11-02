@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}MovieMate – Browse Movies{% endblock %}
+{% block main_class %}container{% endblock %}
+{% block content %}
+
+<div class="home-hero">
+  <h1 class="page-title">Browse Movies</h1>
+  <p class="muted">Discover popular movies. Click any poster to see details.</p>
+  <a href="{{ url_for('recommend') }}" class="btn btn-red">Get Recommendations →</a>
+</div>
+
+<div class="grid" id="movie-grid">
+  {% for m in movies %}
+  <a class="poster hoverable" href="{{ url_for('movie_detail', movie_id=m.id) }}" style="text-decoration:none;">
+    <img src="{{ m.poster }}" alt="{{ m.title }}" loading="lazy">
+    <div class="poster-details">
+      <strong>{{ m.title }}</strong>
+      <small>{{ m.year }} · ★ {{ m.rating }}</small>
+      <small>{{ m.genres }}</small>
+    </div>
+    <div class="poster-info">{{ m.title }}{% if m.year %} ({{ m.year }}){% endif %}</div>
+  </a>
+  {% endfor %}
+</div>
+
+{% if has_more %}
+<div class="load-more-wrap">
+  <button class="btn btn-grey" id="load-more-btn" data-page="{{ page + 1 }}">
+    Load More
+  </button>
+</div>
+{% endif %}
+
+<script>
+  const btn = document.getElementById('load-more-btn');
+  if (btn) {
+    btn.addEventListener('click', async () => {
+      const page = parseInt(btn.dataset.page);
+      btn.textContent = 'Loading…';
+      btn.disabled = true;
+
+      const res    = await fetch('/api/browse?page=' + page);
+      const data   = await res.json();
+      const grid   = document.getElementById('movie-grid');
+
+      data.movies.forEach(m => {
+        const a = document.createElement('a');
+        a.className = 'poster hoverable';
+        a.href = '/movie/' + m.id;
+        a.style.textDecoration = 'none';
+
+        const img = document.createElement('img');
+        img.src = m.poster; img.alt = m.title; img.loading = 'lazy';
+
+        const details = document.createElement('div');
+        details.className = 'poster-details';
+        details.innerHTML =
+          '<strong>' + m.title + '</strong>' +
+          '<small>' + (m.year || '') + ' · ★ ' + m.rating + '</small>' +
+          '<small>' + m.genres + '</small>';
+
+        const info = document.createElement('div');
+        info.className = 'poster-info';
+        info.textContent = m.title + (m.year ? ' (' + m.year + ')' : '');
+
+        a.append(img, details, info);
+        grid.append(a);
+      });
+
+      if (data.has_more) {
+        btn.dataset.page = page + 1;
+        btn.textContent  = 'Load More';
+        btn.disabled     = false;
+      } else {
+        btn.closest('.load-more-wrap').remove();
+      }
+    });
+  }
+</script>
+{% endblock %}
+

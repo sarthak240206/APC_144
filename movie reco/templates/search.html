@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Search Movies – MovieMate{% endblock %}
+{% block content %}
+
+<h1 class="page-title">Search Movies</h1>
+<p class="muted">Find any movie by title. Click a poster to see full details.</p>
+
+<form method="get" action="{{ url_for('search_page') }}" id="search-form">
+  <div style="display:flex; gap:10px; margin:18px 0;">
+    <input type="text"
+           name="q"
+           id="search-input"
+           class="search"
+           style="margin:0; flex:1;"
+           placeholder="e.g. Inception, Batman, Spider-Man…"
+           value="{{ query }}"
+           autocomplete="off">
+    <button type="submit" class="btn btn-red">Search</button>
+  </div>
+</form>
+
+{% if query %}
+  {% if movies %}
+    <h2 class="row-title">Results for "{{ query }}" — {{ movies|length }} found</h2>
+    <div class="grid">
+      {% for m in movies %}
+      <a class="poster hoverable" href="{{ url_for('movie_detail', movie_id=m.id) }}" style="text-decoration:none;">
+        <img src="{{ m.poster }}" alt="{{ m.title }}" loading="lazy">
+        <div class="poster-details">
+          <strong>{{ m.title }}</strong>
+          <small>{{ m.year }} · ★ {{ m.rating }}</small>
+          <small>{{ m.genres }}</small>
+        </div>
+        <div class="poster-info">{{ m.title }}{% if m.year %} ({{ m.year }}){% endif %}</div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>😕 No movies found for "<strong>{{ query }}</strong>".</p>
+      <p class="muted">Try a different title or check your spelling.</p>
+    </div>
+  {% endif %}
+{% else %}
+  <div class="empty-state">
+    <p class="muted">Type a movie title above and press Search.</p>
+  </div>
+{% endif %}
+
+{% endblock %}
+

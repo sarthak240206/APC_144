@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Get Recommendations – MovieMate{% endblock %}
+{% block content %}
+
+<h1 class="page-title">Get Recommendations</h1>
+<p class="muted">Apply filters, pick movies you love, or mix both — then hit the button. Everything is optional.</p>
+
+<form method="post" action="{{ url_for('recommend') }}" id="rec-form">
+
+  <!-- ======= SECTION 1: FILTER PREFERENCES ======= -->
+  <div class="filter-panel">
+    <h2 class="row-title" style="margin-top:0;">
+      🎛️ Filter Preferences
+      <span class="muted" style="font-size:.9rem;font-weight:400;">(all optional — use any combination)</span>
+    </h2>
+
+    <!-- Genres (checkboxes) -->
+    <div class="filter-group">
+      <label class="filter-label">Genres — pick one or more</label>
+      <div class="genre-chips-wrap">
+        {% for genre in all_genres %}
+        <label class="genre-chip">
+          {# Re-check boxes that were selected before a validation error #}
+          <input type="checkbox" name="genres" value="{{ genre }}"
+                 {% if genre in prev_genres %}checked{% endif %}>
+          {{ genre }}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Year range + Min Rating + Keyword -->
+    <div class="filter-row">
+      <div class="filter-col">
+        <label class="filter-label">Year From</label>
+        <input type="number" name="year_from" class="filter-input"
+               placeholder="{{ year_min }}"
+               min="{{ year_min }}" max="{{ year_max }}"
+               value="{{ prev_year_from }}">
+      </div>
+      <div class="filter-col">
+        <label class="filter-label">Year To</label>
+        <input type="number" name="year_to" class="filter-input"
+               placeholder="{{ year_max }}"
+               min="{{ year_min }}" max="{{ year_max }}"
+               value="{{ prev_year_to }}">
+      </div>
+      <div class="filter-col">
+        <label class="filter-label">Min Rating (0 – 10)</label>
+        <input type="number" name="min_rating" class="filter-input"
+               placeholder="e.g. 7"
+               min="0" max="10" step="0.1"
+               value="{{ prev_min_rating }}">
+      </div>
+      <div class="filter-col" style="flex:2;">
+        <label class="filter-label">Keyword</label>
+        <input type="text" name="keyword" class="filter-input"
+               placeholder="e.g. space, heist, time travel…"
+               value="{{ prev_keyword }}">
+      </div>
+    </div>
+
+    <!-- Quick-action: filters only, no movies needed -->
+    <div style="margin-top:18px;">
+      <button type="submit" class="btn btn-red">
+        🎬 Get Recommendations with These Filters →
+      </button>
+      <span class="muted" style="font-size:.85rem; margin-left:12px;">
+        (no need to pick movies below)
+      </span>
+    </div>
+  </div>
+
+  <!-- ======= SECTION 2: PICK SPECIFIC MOVIES ======= -->
+  <div class="filter-section-divider">
+    <span>or also pick specific movies for smarter results</span>
+  </div>
+
+  <h2 class="row-title" style="margin-top:8px;">
+    🎬 Pick Movies You Love
+    <span class="muted" style="font-size:.9rem;font-weight:400;">(optional)</span>
+  </h2>
+  <p class="muted" style="margin-bottom:12px;">
+    Search and click any poster to select it. The engine combines your taste with the filters above.
+  </p>
+
+  <!-- Live search box -->
+  <input type="text" id="search" class="search"
+         placeholder="Search movies, e.g. Avengers, Inception…" autocomplete="off">
+
+  <!-- Selected chips tray -->
+  <div class="tray">
+    <span id="count-label">Selected: <b id="count">{{ saved|length }}</b></span>
+    <div id="chips" class="chips"></div>
+    <button class="btn btn-red" type="submit">Get Recommendations →</button>
+  </div>
+
+  <!-- Hidden inputs populated by JS -->
+  <div id="hidden-ids"></div>
+
+  <h2 class="row-title" id="grid-title">Popular movies</h2>
+  <div class="grid" id="grid"></div>
+</form>
+
+<script>
+  const selected = new Map();
+  {{ saved|tojson }}.forEach(m => selected.set(m.id, m));
+
+  const grid  = document.getElementById('grid');
+  const chips = document.getElementById('chips');
+
+  function makeCard(m) {
+    const card = document.createElement('div');
+    card.className = 'poster' + (selected.has(m.id) ? ' chosen' : '');
+    card.dataset.id = m.id;
+
+    const img = document.createElement('img');
+    img.src = m.poster; img.alt = m.title; img.loading = 'lazy';
+
+    const tick = document.createElement('span');
+    tick.className = 'tick'; tick.textContent = '✓';
+
+    const info = document.createElement('div');
+    info.className = 'poster-info';
+    info.textContent = m.title + (m.year ? ' (' + m.year + ')' : '');
+
+    card.append(img, tick, info);
+    card.addEventListener('click', () => toggle(m, card));
+    return card;
+  }
+
+  function toggle(m, card) {
+    if (selected.has(m.id)) selected.delete(m.id); else selected.set(m.id, m);
+    if (card) card.classList.toggle('chosen', selected.has(m.id));
+    refreshTray();
+  }
+
+  function refreshTray() {
+    document.getElementById('count').textContent = selected.size;
+    chips.replaceChildren();
+    selected.forEach(m => {
+      const c = document.createElement('span');
+      c.className = 'chip'; c.textContent = m.title + '  ✕';
+      c.addEventListener('click', () => {
+        selected.delete(m.id);
+        const card = grid.querySelector('[data-id="' + m.id + '"]');
+        if (card) card.classList.remove('chosen');
+        refreshTray();
+      });
+      chips.append(c);
+    });
+    const box = document.getElementById('hidden-ids');
+    box.replaceChildren();
+    selected.forEach(m => {
+      const i = document.createElement('input');
+      i.type = 'hidden'; i.name = 'movie_ids'; i.value = m.id;
+      box.append(i);
+    });
+  }
+
+  async function load(q) {
+    const res    = await fetch('/api/search?q=' + encodeURIComponent(q));
+    const movies = await res.json();
+    document.getElementById('grid-title').textContent =
+      q ? 'Results for "' + q + '"' : 'Popular movies';
+    grid.replaceChildren(...movies.map(makeCard));
+    if (!movies.length) grid.textContent = 'No movies found.';
+  }
+
+  let timer;
+  document.getElementById('search').addEventListener('input', e => {
+    clearTimeout(timer);
+    timer = setTimeout(() => load(e.target.value), 300);
+  });
+
+  refreshTray();
+  load('');
+</script>
+{% endblock %}
+
